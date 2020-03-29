@@ -1,0 +1,61 @@
+﻿@page "/customers"
+@using Blazor.Models
+@inject HttpClient http
+
+    <div class="container">
+
+        <NavLink class="nav-link" href="customers/add">
+            <span class="btn btn-primary" aria-hidden="true">Lägg till kund</span>
+        </NavLink>
+
+        <table class="table table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Förnamn</th>
+                    <th scope="col">Efternamn</th>
+                    <th scope="col">E-postadress</th>
+                    <th scope="col">Åtgärder</th>
+                </tr>
+            </thead>
+            @if (customers != null)
+            {
+                <tbody>
+                    @foreach (var customer in customers)
+                    {
+                        <tr>
+                            <th scope="row">@customer.Id</th>
+                            <td>@customer.FirstName</td>
+                            <td>@customer.LastName</td>
+                            <td>@customer.Email</td>
+                            <td>
+                                <a class="btn btn-primary" href="customers/update/@customer.Id">Ändra</a>
+                                <span class="btn btn-primary" @onclick="(() => DeleteCustomer(customer.Id))">Ta Bort</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            }
+        </table>
+    </div>
+
+@code {
+    CustomerClass[] customers { get; set; }
+
+    async Task GetCustomers()
+    {
+        customers = await http.GetJsonAsync<CustomerClass[]>("http://localhost:53738/api/customers");
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCustomers();
+    }
+
+    private async Task DeleteCustomer(int id)
+    {
+        await http.DeleteAsync($"http://localhost:53738/api/customers/{id}");
+        await GetCustomers();
+    }
+}

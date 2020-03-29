@@ -1,0 +1,36 @@
+﻿@page "/casestatus/update/{Id:int}"
+@using Blazor.Models
+@inject HttpClient http
+@inject NavigationManager navigationManager
+
+<div class="container">
+    <EditForm class="my-5" Model="caseStatus" OnSubmit="@EditCaseStatus">
+        <h5 class="mb-3">Ändra Ärende status!</h5>
+        <div class="form-group">
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Status..." @bind="caseStatus.Status" />
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Ändra Ärende Status</button>
+    </EditForm>
+</div>
+
+
+@code {
+    [Parameter] public int Id { get; set; }
+    CaseStatusClass caseStatus = new CaseStatusClass();
+
+    protected async override Task OnParametersSetAsync()
+    {
+        caseStatus = await http.GetJsonAsync<CaseStatusClass>($"http://localhost:53738/api/casestatus/{Id}");
+    }
+
+    async Task EditCaseStatus()
+    {
+        await http.PutJsonAsync("http://localhost:53738/api/casestatus", caseStatus);
+        navigationManager.NavigateTo("casestatus");
+    }
+}

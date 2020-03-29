@@ -1,0 +1,42 @@
+﻿@page "/customers/update/{Id:int}"
+@using Blazor.Models
+@inject HttpClient http
+@inject NavigationManager navigationManager
+
+<div class="container">
+    <EditForm class="my-5" Model="customer" OnSubmit="@EditCustomer">
+        <h5 class="mb-3">Ändra Kund!</h5>
+        <div class="form-group">
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Förnamn..." @bind="customer.FirstName" />
+
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Efternamn..." @bind="customer.LastName" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="E-postadress..." @bind="customer.Email" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Ändra Kund</button>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    CustomerClass customer = new CustomerClass();
+
+    protected async override Task OnParametersSetAsync()
+    {
+        customer = await http.GetJsonAsync<CustomerClass>($"http://localhost:53738/api/customers/{Id}");
+    }
+
+    async Task EditCustomer()
+    {
+        await http.PutJsonAsync("http://localhost:53738/api/customers", customer);
+        navigationManager.NavigateTo("customers");
+    }
+}

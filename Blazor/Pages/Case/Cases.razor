@@ -1,0 +1,66 @@
+﻿@page "/cases"
+@using Blazor.Models
+@inject HttpClient http
+
+    <div class="container">
+
+        <NavLink class="nav-link" href="cases/add">
+            <span class="btn btn-primary" aria-hidden="true">Lägg till ärende</span>
+        </NavLink>
+
+        <table class="table table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Kund</th>
+                    <th scope="col">Registrerad</th>
+                    <th scope="col">Titel</th>
+                    <th scope="col">Beskrivning</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Åtgärder</th>
+                </tr>
+            </thead>
+            @if (cases != null)
+            {
+                <tbody>
+                    @foreach (var Case in cases)
+                    {
+                        <tr>
+                            <th scope="row">@Case.Id</th>
+                            <td>@Case.CustomerName</td>
+                            <td>@Case.Register</td>
+                            <td>@Case.Title</td>
+                            <td>@Case.Description</td>
+                            <td>@Case.Status</td>
+                            <td>
+                                <a class="btn btn-primary" href="Case/update/@Case.Id">Ändra</a>
+                                <span class="btn btn-primary" @onclick="(() => DeleteCase(Case.Id))">Ta Bort</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            }
+        </table>
+    </div>
+
+
+@code {
+    CaseClass[] cases { get; set; }
+
+    async Task GetCases()
+    {
+        cases = await http.GetJsonAsync<CaseClass[]>("http://localhost:53738/api/cases");
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetCases();
+    }
+
+    private async Task DeleteCase(int id)
+    {
+        await http.DeleteAsync($"http://localhost:53738/api/cases/{id}");
+        await GetCases();
+    }
+}

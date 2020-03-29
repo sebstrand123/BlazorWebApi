@@ -1,0 +1,29 @@
+﻿@page "/casestatus/add"
+@using Blazor.Models
+@inject HttpClient http
+@inject NavigationManager navigationManager
+
+<div class="container">
+    <EditForm class="my-5" Model="caseStatus" OnSubmit="@CreateCaseStatus">
+        <h5 class="mb-3">Skapa Ärende status!</h5>
+        <div class="form-group">
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Status..." @bind="caseStatus.Status" />
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-success">Skapa Ärende Status</button>
+    </EditForm>
+</div>
+
+@code {
+    CaseStatusClass caseStatus = new CaseStatusClass();
+
+    private async Task CreateCaseStatus()
+    {
+        await http.PostJsonAsync("http://localhost:53738/api/casestatus", caseStatus);
+        navigationManager.NavigateTo("casestatus");
+    }
+}

@@ -1,0 +1,47 @@
+﻿@page "/Case/update/{Id:int}"
+@using Blazor.Models
+@inject HttpClient http
+@inject NavigationManager navigationManager
+
+<div class="container">
+    <EditForm class="my-5" Model="Case" OnSubmit="@EditCase">
+        <h5 class="mb-3">Ändra Ärende!</h5>
+        <div class="form-group">
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Kund..." @bind="Case.CustomerName" />
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Registrerad..." @bind="Case.Register" />
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Titel..." @bind="Case.Title" />
+                </div>
+                <div class="col">
+                    <input type="text" class="form-control" placeholder="Status..." @bind="Case.Status" />
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <input type="text" class="form-control" placeholder="Beskrivning..." @bind="Case.Description" />
+        </div>
+
+        <button type="submit" class="btn btn-success">Ändra Ärende</button>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    CaseClass Case = new CaseClass();
+
+    protected async override Task OnParametersSetAsync()
+    {
+        Case = await http.GetJsonAsync<CaseClass>($"http://localhost:53738/api/cases/{Id}");
+    }
+
+    async Task EditCase()
+    {
+        await http.PutJsonAsync("http://localhost:53738/api/cases", Case);
+        navigationManager.NavigateTo("cases");
+    }
+}
